@@ -1,12 +1,19 @@
 package com.amazing_apps.ray.spd;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -36,12 +43,20 @@ public class MainActivity extends AppCompatActivity {
     TextView tv_loading;
     String android_id,Username;
     int participant_num;
+    int widthpx,heightpx;
 
     //do
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        heightpx = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, displayMetrics.heightPixels, getResources().getDisplayMetrics());
+        widthpx = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, displayMetrics.widthPixels, getResources().getDisplayMetrics());
 
         // first page is loaded
         super.onCreate(savedInstanceState);
@@ -467,9 +482,15 @@ public class MainActivity extends AppCompatActivity {
     public void display_game()
     {
         setContentView(R.layout.game);
-        final TextView players_names;
+        Button startbutton;
 
-        players_names = (TextView)findViewById(R.id.textView111);
+        //height and width of screen
+
+        startbutton =(Button)findViewById(R.id.start_button);
+
+        startbutton.setBackground(new BitmapDrawable(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                R.drawable.cb), widthpx/2, widthpx/2, false)));
+
     }
 
 }
