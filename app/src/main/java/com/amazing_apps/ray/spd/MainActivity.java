@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -36,14 +37,17 @@ public class MainActivity extends AppCompatActivity {
 
 
     Firebase Root,Players;
-    DatabaseReference databaseReference,databaseReference1,databaseReference2,databaseReference3;
+    DatabaseReference databaseReference,databaseReference1,databaseReference2,databaseReference3,databaseReference4;
     ProgressBar progressBar,progBar;
     Thread thread;
     Boolean connected=false,authenticated=false,lobbyfill=false;
     TextView tv_loading;
-    String android_id,Username;
-    int participant_num;
+    String android_id,Username,lobbyname;
+    int participant_num=1;
     int widthpx,heightpx;
+    int width,height;
+    Boolean gamestart=false;
+    Boolean onetimeclicked=false;
 
     //do
 
@@ -55,6 +59,9 @@ public class MainActivity extends AppCompatActivity {
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+        height = displayMetrics.heightPixels;
+        width = displayMetrics.widthPixels;
         heightpx = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, displayMetrics.heightPixels, getResources().getDisplayMetrics());
         widthpx = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, displayMetrics.widthPixels, getResources().getDisplayMetrics());
 
@@ -77,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
         databaseReference1 = FirebaseDatabase.getInstance().getReference().child("Players");
         databaseReference2 = FirebaseDatabase.getInstance().getReference().child("Lobby");
         databaseReference3 = FirebaseDatabase.getInstance().getReference().child("Lobby");
+        databaseReference4 = FirebaseDatabase.getInstance().getReference().child("Lobby");
 
 
 
@@ -358,8 +366,15 @@ public class MainActivity extends AppCompatActivity {
                         Root.child("Lobby").child(et_new_lobby.getText().toString()).child("Participant 2").setValue("empty");
                         Root.child("Lobby").child(et_new_lobby.getText().toString()).child("Participant 3").setValue("empty");
                         Root.child("Lobby").child(et_new_lobby.getText().toString()).child("Participant 4").setValue("empty");
+                        Root.child("Lobby").child(et_new_lobby.getText().toString()).child("Ready1").setValue("no");
+                        Root.child("Lobby").child(et_new_lobby.getText().toString()).child("Ready2").setValue("no");
+                        Root.child("Lobby").child(et_new_lobby.getText().toString()).child("Ready3").setValue("no");
+                        Root.child("Lobby").child(et_new_lobby.getText().toString()).child("Ready4").setValue("no");
+
+
 
                         Toast.makeText(getApplicationContext(),"Lobby created "+et_new_lobby.getText().toString(),Toast.LENGTH_SHORT).show();
+                        lobbyname = et_new_lobby.getText().toString();
                         display_game();
                     }
                     else
@@ -432,6 +447,7 @@ public class MainActivity extends AppCompatActivity {
                         {
                             participant_num =2;
                             lobbyfill=true;
+                            lobbyname=arrayList.get(position);
                             Root.child("Lobby").child(arrayList.get(position)).child("Participant 2").setValue(Username);
                             display_game();
                         }
@@ -439,6 +455,7 @@ public class MainActivity extends AppCompatActivity {
                         {
                             participant_num =3;
                             lobbyfill=true;
+                            lobbyname=arrayList.get(position);
                             Root.child("Lobby").child(arrayList.get(position)).child("Participant 3").setValue(Username);
                             display_game();
                         }
@@ -446,6 +463,7 @@ public class MainActivity extends AppCompatActivity {
                         {
                             participant_num =4;
                             lobbyfill=true;
+                            lobbyname=arrayList.get(position);
                             Root.child("Lobby").child(arrayList.get(position)).child("Participant 4").setValue(Username);
                             display_game();
                         }
@@ -481,16 +499,143 @@ public class MainActivity extends AppCompatActivity {
 
     public void display_game()
     {
+
+
         setContentView(R.layout.game);
-        Button startbutton;
+        final ImageButton startbutton;
 
         //height and width of screen
 
-        startbutton =(Button)findViewById(R.id.start_button);
-
+        startbutton =(ImageButton)findViewById(R.id.start_button);
         startbutton.setBackground(new BitmapDrawable(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
-                R.drawable.cb), widthpx/2, widthpx/2, false)));
+                R.drawable.ready), widthpx/2, widthpx/2, false)));
 
+
+
+
+        startbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!gamestart && !onetimeclicked)
+                {
+                    startbutton.setBackground(new BitmapDrawable(Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                            R.drawable.start), widthpx/2, widthpx/2, false)));
+
+                    Toast.makeText(getApplicationContext(),"You are now in lobby "+lobbyname,Toast.LENGTH_SHORT).show();
+                    Root.child("Lobby").child(lobbyname).child("Ready"+participant_num).setValue("YES");
+                    onetimeclicked=true;
+
+
+                    Query query = databaseReference3.orderByChild("Lobby Name").equalTo(lobbyname);
+
+
+                    query.addChildEventListener(new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+                            String st1 = dataSnapshot.child("Ready1").getValue().toString();
+                            String st2 = dataSnapshot.child("Ready2").getValue().toString();
+                            String st3 = dataSnapshot.child("Ready3").getValue().toString();
+                            String st4 = dataSnapshot.child("Ready4").getValue().toString();
+
+                            TextView tct = (TextView)findViewById(R.id.textView_wait);
+
+                            if(st1.equals("YES") && st2.equals("YES") && st3.equals("YES") && st4.equals("YES"))
+                            {
+                                gamestart=true;
+                            }
+                            tct.setText(st1+st2+st3+st4);
+                        }
+
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                        }
+
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+
+
+                }
+                else if(!gamestart)
+                {
+                    Query query = databaseReference3.orderByChild("Lobby Name").equalTo(lobbyname);
+
+
+                    query.addChildEventListener(new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+                            String st1 = dataSnapshot.child("Ready1").getValue().toString();
+                            String st2 = dataSnapshot.child("Ready2").getValue().toString();
+                            String st3 = dataSnapshot.child("Ready3").getValue().toString();
+                            String st4 = dataSnapshot.child("Ready4").getValue().toString();
+
+                            TextView tct = (TextView)findViewById(R.id.textView_wait);
+
+                            if(st1.equals("YES") && st2.equals("YES") && st3.equals("YES") && st4.equals("YES"))
+                            {
+                                gamestart=true;
+                            }
+                            tct.setText(st1+st2+st3+st4);
+                        }
+
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                        }
+
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    if(!gamestart)
+                    Toast.makeText(getApplicationContext(),"Wait For other players",Toast.LENGTH_SHORT).show();
+                    else
+                    {
+                        display_spd();
+                    }
+                }
+                else
+                {
+                    display_spd();
+                }
+
+
+
+            }
+        });
+    }
+
+    public void display_spd()
+    {
+        setContentView(R.layout.spd_game);
     }
 
 }
