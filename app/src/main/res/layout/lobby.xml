@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/lobby_layout">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="join nearby lobby"
+        />
+
+    <ListView
+        android:id="@+id/id_lobby_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+
+    </ListView>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="create new lobby"
+        android:gravity="center_horizontal"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/id_et_create_lobby"
+        android:hint="Lobby Name"
+        />
+
+    <Button
+        android:id="@+id/id_newlobby"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Create a new Lobby"/>
+
+
+</LinearLayout>
