@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,8 @@ import com.google.firebase.database.Query;
 import android.provider.Settings.Secure;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -636,6 +639,13 @@ public class MainActivity extends AppCompatActivity {
     public void display_spd()
     {
         setContentView(R.layout.spd_game);
-    }
+        TextView num_cards;
+        num_cards = (TextView) findViewById(R.id.no_of_cards);
+        num_cards.setText("num of cards");
 
+        if(participant_num==1)
+        {
+            //create a random card selection
+        }
+    }
 }
